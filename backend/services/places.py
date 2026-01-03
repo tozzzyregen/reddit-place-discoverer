@@ -58,7 +58,7 @@ def search_google_places(query: str) -> list[dict]:
             "formatted_address": place.get("formattedAddress"),
             "rating": place.get("rating"),
             "photo_reference": photo_reference,
-            "user_ratings_total": place.get("userRatingCount"),
+            "user_ratings_total": place.get("userRatingCount", 0),
             "open_now": open_now,
             "business_status": place.get("businessStatus")
         })
