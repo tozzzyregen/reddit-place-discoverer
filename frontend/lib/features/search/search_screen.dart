@@ -7,7 +7,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'search_provider.dart';
+import 'detail_screen.dart';
 import 'widgets/place_card.dart';
+import 'widgets/skeleton_place_card.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -118,21 +120,46 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
             // Results List
             Expanded(
-              child: searchResults.isEmpty
-                  ? Center(
-                      child: Text(
-                        'Search for a destination to get started',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: searchResults.length,
+              child: _isLoading
+                  ? ListView.builder(
+                      itemCount: 5,
                       itemBuilder: (context, index) {
-                        final place = searchResults[index];
-                        return PlaceCard(place: place);
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: SkeletonPlaceCard(),
+                        );
                       },
-                    ),
+                    )
+                  : searchResults.isEmpty
+                      ? Center(
+                          child: Text(
+                            'Search for a destination to get started',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: searchResults.length,
+                          itemBuilder: (context, index) {
+                            final place = searchResults[index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailScreen(
+                                        placeName: place['name'] ?? 'Unknown',
+                                        address: place['formatted_address'] ?? '',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: PlaceCard(place: place),
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),

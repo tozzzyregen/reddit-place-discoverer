@@ -46,24 +46,67 @@ class TripDetailScreen extends ConsumerWidget {
                 final place = itinerary[index];
                 return _PlaceCard(
                   place: place,
-                  onRemove: () async {
-                    final placeName = place['name'] ?? '';
-                    final success = await ref
-                        .read(tripsProvider.notifier)
-                        .removeFromTrip(tripId, placeName);
-
-                    if (success && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Removed "$placeName"'),
-                          backgroundColor: Colors.red[700],
-                        ),
-                      );
-                    }
-                  },
+                  onRemove: () => _showDeleteConfirmDialog(
+                    context,
+                    ref,
+                    tripId,
+                    place['name'] ?? '',
+                  ),
                 );
               },
             ),
+    );
+  }
+
+  void _showDeleteConfirmDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String tripId,
+    String placeName,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text(
+          'Remove Place?',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          'Are you sure you want to remove this place from your trip?',
+          style: TextStyle(color: Colors.grey),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final success = await ref
+                  .read(tripsProvider.notifier)
+                  .removeFromTrip(tripId, placeName);
+
+              if (success && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Removed "$placeName"'),
+                    backgroundColor: Colors.red[700],
+                  ),
+                );
+              }
+            },
+            child: const Text(
+              'Remove',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
