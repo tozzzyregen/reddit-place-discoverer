@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'search_provider.dart';
-import 'detail_screen.dart';
+import 'widgets/place_card.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -130,95 +130,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       itemCount: searchResults.length,
                       itemBuilder: (context, index) {
                         final place = searchResults[index];
-                        return _PlaceCard(place: place);
+                        return PlaceCard(place: place);
                       },
                     ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _PlaceCard extends StatelessWidget {
-  final dynamic place;
-
-  const _PlaceCard({required this.place});
-
-  @override
-  Widget build(BuildContext context) {
-    final name = place['name'] ?? 'Unknown';
-    final address = place['formatted_address'] ?? '';
-    final rating = place['rating'];
-    final hasPhoto = place['photo_reference'] != null;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey[900],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        leading: Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            color: Colors.grey[800],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: hasPhoto
-              ? const Icon(Icons.image, color: Colors.grey)
-              : const Icon(Icons.place, color: Color(0xFFFF4500)),
-        ),
-        title: Text(
-          name,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(
-              address,
-              style: TextStyle(color: Colors.grey[400], fontSize: 12),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (rating != null) ...[
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Icon(Icons.star, color: Color(0xFFFF4500), size: 14),
-                  const SizedBox(width: 4),
-                  Text(
-                    rating.toString(),
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ],
-              ),
-            ],
-          ],
-        ),
-        trailing: const Icon(
-          Icons.chevron_right,
-          color: Colors.grey,
-        ),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DetailScreen(
-                placeName: name,
-                address: address,
-              ),
-            ),
-          );
-        },
       ),
     );
   }

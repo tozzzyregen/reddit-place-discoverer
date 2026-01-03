@@ -24,7 +24,7 @@ def search_google_places(query: str) -> list[dict]:
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": api_key,
-        "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.photos"
+        "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.photos,places.userRatingCount,places.businessStatus,places.currentOpeningHours"
     }
     payload = {
         "textQuery": query
@@ -48,12 +48,19 @@ def search_google_places(query: str) -> list[dict]:
         if photos:
             photo_reference = photos[0].get("name")  # New API uses 'name' for photo reference
         
+        # Get opening hours info
+        opening_hours = place.get("currentOpeningHours", {})
+        open_now = opening_hours.get("openNow", None)
+        
         results.append({
             "name": place.get("displayName", {}).get("text"),
             "place_id": place.get("id"),
             "formatted_address": place.get("formattedAddress"),
             "rating": place.get("rating"),
-            "photo_reference": photo_reference
+            "photo_reference": photo_reference,
+            "user_ratings_total": place.get("userRatingCount"),
+            "open_now": open_now,
+            "business_status": place.get("businessStatus")
         })
     
     return results
