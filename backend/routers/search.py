@@ -27,13 +27,16 @@ async def get_photo(
     if not api_key:
         raise HTTPException(status_code=500, detail="API key not configured")
     
-    # Construct the Google Places Photo URL
-    url = f"https://maps.googleapis.com/maps/api/place/photo?maxwidth={maxwidth}&photoreference={reference}&key={api_key}"
+    # New Places API (v1) uses different URL format
+    # Reference looks like: "places/{placeId}/photos/{photoId}"
+    url = f"https://places.googleapis.com/v1/{reference}/media?maxWidthPx={maxwidth}&key={api_key}"
     
     try:
         response = requests.get(url, stream=True, timeout=10)
+        print(f"DEBUG Photo proxy: status={response.status_code}, url={url[:80]}...")
         
         if response.status_code != 200:
+            print(f"DEBUG Photo error: {response.text[:200]}")
             raise HTTPException(status_code=404, detail="Photo not found")
         
         content_type = response.headers.get("Content-Type", "image/jpeg")
