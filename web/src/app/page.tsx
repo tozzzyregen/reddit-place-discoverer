@@ -14,11 +14,13 @@ interface ResearchResponse {
   hunter_queries: string[];
   results: SearchResult[];
   total_results: number;
+  source_type?: "memory" | "live";
 }
 
 export default function Home() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [sourceType, setSourceType] = useState<"memory" | "live" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = async () => {
@@ -26,6 +28,7 @@ export default function Home() {
 
     setIsLoading(true);
     setResults([]);
+    setSourceType(null);
 
     try {
       const response = await fetch(
@@ -45,6 +48,7 @@ export default function Home() {
 
       const data: ResearchResponse = await response.json();
       setResults(data.results);
+      setSourceType(data.source_type || null);
     } catch (error) {
       console.error("Search error:", error);
     } finally {
@@ -99,16 +103,38 @@ export default function Home() {
       {/* Results Grid */}
       {!isLoading && results.length > 0 && (
         <div className="px-6 pb-20">
-          <p className="text-center text-gray-500 mb-8">
-            Found {results.length} sources
-          </p>
+          <div className="text-center mb-8">
+            <p className="text-gray-500">
+              Found {results.length} sources
+            </p>
+            {sourceType && (
+              <span className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-medium ${
+                sourceType === "memory" 
+                  ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30" 
+                  : "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
+              }`}>
+                {sourceType === "memory" ? "⚡ Instant Vibe" : "🌐 Fresh Discovery"}
+              </span>
+            )}
+          </div>
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {results.map((result, index) => (
               <div
                 key={index}
-                className="bg-gray-800 rounded-xl p-6 hover:bg-gray-700 transition-colors"
+                className="relative bg-gray-800 rounded-xl p-6 hover:bg-gray-700 transition-colors group cursor-pointer"
               >
-                <h3 className="text-xl font-bold text-white line-clamp-2">
+                {/* Source Badge */}
+                {sourceType && (
+                  <div className={`absolute top-3 right-3 px-2 py-1 rounded text-xs font-medium ${
+                    sourceType === "memory"
+                      ? "bg-yellow-500/20 text-yellow-400"
+                      : "bg-cyan-500/20 text-cyan-400"
+                  }`}>
+                    {sourceType === "memory" ? "⚡" : "🌐"}
+                  </div>
+                )}
+                
+                <h3 className="text-xl font-bold text-white line-clamp-2 pr-8 group-hover:text-orange-400 transition-colors">
                   {result.title || "Untitled"}
                 </h3>
                 <p className="mt-3 text-gray-400 text-sm line-clamp-3">
@@ -120,6 +146,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-4 inline-block text-blue-400 text-sm hover:text-blue-300 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     Read Source →
                   </a>
