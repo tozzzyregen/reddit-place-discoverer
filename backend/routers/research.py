@@ -30,11 +30,13 @@ async def research(request: ResearchRequest):
         
         # Step 4: Log to database
         try:
-            supabase.table("search_logs").insert({
+            log_data = {
                 "user_query": request.query,
-                "refined_intent": hunter_queries,
-                "user_id": request.user_id
-            }).execute()
+                "refined_intent": hunter_queries
+            }
+            if request.user_id:
+                log_data["user_id"] = request.user_id
+            supabase.table("search_logs").insert(log_data).execute()
         except Exception as e:
             print(f"Warning: Failed to log search: {e}")
         

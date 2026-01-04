@@ -73,7 +73,7 @@ Return ONLY a JSON array of 3 strings, no other text."""
                 response = self.exa.search_and_contents(
                     query,
                     num_results=3,
-                    use_autoprompt=True
+                    type="auto"
                 )
                 
                 for result in response.results:
