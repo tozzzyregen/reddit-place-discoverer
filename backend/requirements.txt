@@ -8,3 +8,4 @@ openai
 exa-py
 stripe
 email-validator
+thefuzz

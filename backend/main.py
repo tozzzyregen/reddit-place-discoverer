@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import search, analyze, trips, payments, profile
+from .routers import search, analyze, trips, payments, profile, research
 
 app = FastAPI(title="The Vibe Check API")
 
@@ -19,6 +19,7 @@ app.include_router(analyze.router)
 app.include_router(trips.router)
 app.include_router(payments.router)
 app.include_router(profile.router)
+app.include_router(research.router)
 
 
 @app.on_event("startup")
@@ -32,6 +33,7 @@ async def startup_event():
     print("Trip Management Logic Added")
     print("Payment Router Ready")
     print("Profile API Ready")
+    print("Knowledge Engine (Phase 2) is Active")
 
 
 @app.get("/")
